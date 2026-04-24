@@ -18,9 +18,13 @@
 ```mermaid
 flowchart TD
 
-    P1["PHASE 1 — PRD
+    P1["PHASE 1a — PRD
      Written manually (or via brainstorming)
      → docs/prd/prd.md"]
+
+    P1b["PHASE 1b — Architecture Design
+     architecture-designer + the-fool
+     → docs/architecture/"]
 
     P2["PHASE 2 — Project Initialization
       CLAUDE.md + Templates + git + CI
@@ -64,7 +68,7 @@ flowchart TD
      PR (staging → main) → full E2E on staging → merge → smoke test prod
      → tagged release, production live"]
 
-    P1 --> P2 --> S1
+    P1 --> P1b --> P2 --> S1
     S6 -->|"next feature"| S1
     S6 -->|"ready to ship"| P4
     P4 -->|"next cycle"| S1
@@ -72,7 +76,7 @@ flowchart TD
 
 ---
 
-## PHASE 1 — PRD *(once per project)*
+## PHASE 1a — PRD *(once per project)*
 
 **Purpose:** Define what the product is at a level that won't churn weekly. The PRD answers "what and why"; it's a reference, not a contract.
 
@@ -113,6 +117,36 @@ Either way, the PRD should contain at minimum:
 **Output:** `docs/prd/prd.md`
 
 **Living doc rule:** PRD can change. Log meaningful changes somewhere visible — either in the PRD itself (changelog section) or in a `DECISIONS.md` at the repo root. When the PRD changes, ask: *does this invalidate shipped features?* If yes, either remove/migrate the feature or the PRD change is wrong.
+
+---
+
+## PHASE 1b — Architecture Design *(once per project)*
+
+**Purpose:** Translate the PRD into a high-level technical blueprint before scaffolding begins. This is the bridge between "what and why" (PRD) and "how it's built" (implementation). Architecture decisions made here inform every subsequent feature spec.
+
+**Skills used** (from [github.com/jeffallan/claude-skills](https://github.com/jeffallan/claude-skills)):
+
+- **`architecture-designer`** — principal architect persona; gathers requirements, matches them to architectural patterns, produces system design, data model, component diagrams (Mermaid), ADRs, and technology recommendations with explicit trade-offs
+- **`the-fool`** — adversarial reviewer; challenges assumptions, surfaces gaps and contradictions in the design; if its challenges are valid, return to design and revise
+
+**How to trigger:**
+
+> *"I want to design the overall architecture for Doggies using the 'architecture-designer' skill. Help me document this rigorously by generating the appropriate documents which will be helpful later to develop individual features, and also include a Mermaid diagram. Save the output to `docs/architecture/system-design.md`, the data model to `docs/architecture/data-model.md`, the features overview to `docs/architecture/features.md`, and each ADR to `docs/architecture/decisions/`. Then test this decision with the 'the-fool' skill."*
+
+The skill can read from `docs/prd/prd.md`, but if it's not provided it will prompt the user with questions. It follows a five-step internal workflow: gather requirements → identify patterns → design with trade-offs → write ADRs → review with `the-fool`.
+
+> **Important:** `architecture-designer` outputs inline in the conversation (`output-format: document`). You must include explicit file-save instructions in your prompt (as shown above) or the output stays in chat only.
+
+**Output:**
+
+| Document                                         | Path                                         |
+| ------------------------------------------------ | -------------------------------------------- |
+| System overview + architecture diagram (Mermaid) | `docs/architecture/system-design.md`       |
+| Data model                                       | `docs/architecture/data-model.md`          |
+| Features breakdown                               | `docs/architecture/features.md`            |
+| Architecture Decision Records                    | `docs/architecture/decisions/ADR-00X-*.md` |
+
+**Living doc rule:** When a major technical decision changes, mark the relevant ADR as Superseded and create a new one. Don't silently edit existing ADRs — the decision trail is the value.
 
 ---
 
