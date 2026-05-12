@@ -68,7 +68,20 @@ Before adding any tool, library, service, or platform that is core to business v
 
 This does NOT apply to dev-time engineering details (linters, formatters, test runners, individual utility packages). Use judgment for those.
 
-## 6. Surgical Changes
+## 6. Architecture
+
+**Modular monolith. Swappable boundaries around every external dependency.**
+
+The project is one deployable application with strict internal boundaries. Microservices are out of scope.
+
+**Always-on rules:**
+
+* Every third-party service is wrapped behind an interface. The vendor SDK never leaks into business logic. To swap vendor A for vendor B, you should change one adapter file and one line of wiring - nothing else.
+* Vendor names (e.g., `openai`, `whisper`, `supabase`) only appear in adapter modules and config. If they appear anywhere else, the boundary is wrong - stop and fix it before continuing.
+
+**For all planning-phase work** that involves new modules, new services, new external integrations, or any non-trivial structural decision: read `ARCHITECTURE.md` and follow its guidance. If the user @-mentions `ARCHITECTURE.md`, treat it as the authoritative reference for the task.
+
+## 7. Surgical Changes
 
 **Touch only what you must. Clean up only your own mess.**
 
@@ -86,7 +99,7 @@ When your changes create orphans:
 
 The test: Every changed line should trace directly to the user's request.
 
-## 7. Goal-Driven Execution
+## 8. Goal-Driven Execution
 
 **Define success criteria. Loop until verified.**
 

@@ -122,7 +122,7 @@ Either way, the PRD should contain at minimum:
 
 ## PHASE 1b — Architecture Design *(once per project)*
 
-**Purpose:** Translate the PRD into a high-level technical blueprint before scaffolding begins. This is the bridge between "what and why" (PRD) and "how it's built" (implementation). Architecture decisions made here inform every subsequent feature spec.
+**Purpose:** Translate the PRD (if existing) into a high-level technical blueprint before scaffolding begins. This is the bridge between "what and why" (PRD) and "how it's built" (implementation). Architecture decisions made here inform every subsequent feature spec.
 
 **Skills used** (from [github.com/jeffallan/claude-skills](https://github.com/jeffallan/claude-skills)):
 
@@ -135,7 +135,7 @@ Either way, the PRD should contain at minimum:
 
 The skill can read from `docs/prd/prd.md`, but if it's not provided it will prompt the user with questions. It follows a five-step internal workflow: gather requirements → identify patterns → design with trade-offs → write ADRs → review with `the-fool`.
 
-> **Important:** `architecture-designer` outputs inline in the conversation (`output-format: document`). You must include explicit file-save instructions in your prompt (as shown above) or the output stays in chat only.
+**Important:** `architecture-designer` outputs inline in the conversation (`output-format: document`). You must include explicit file-save instructions in your prompt (as shown above) or the output stays in chat only.
 
 **Output:**
 
@@ -147,6 +147,13 @@ The skill can read from `docs/prd/prd.md`, but if it's not provided it will prom
 | Architecture Decision Records                    | `docs/architecture/decisions/ADR-00X-*.md` |
 
 **Living doc rule:** When a major technical decision changes, mark the relevant ADR as Superseded and create a new one. Don't silently edit existing ADRs — the decision trail is the value.
+
+**>>> Notes on experimentation**: Even though we specified the names of the documents, the agent generated a different (similar) set of docs:
+
+- docs/architecture/ADR-00X-*.md
+- docs/architecture/data-model.md
+- docs/architectrure/system-overview.md
+- docs/prd/features-proposal.md
 
 ---
 
@@ -182,7 +189,7 @@ Create `CLAUDE.md` at the repo root with these sections:
 * **Mission + current status** — one paragraph each.
 * **Stack + env vars + invariants** — the operating contract.
 * **Build philosophy** — your Doggies-specific directives:
-  * Preference order: OSS → free SaaS → paid SaaS → custom
+  * Preference order: OSS → free/paid SaaS or custom (skill `tool-selection`)
   * Propose 2–3 options per feature; flag SaaS replacements (payments → Stripe, chat → Discord, etc.)
   * Custom is last resort and must be justified
 * **TDD directive** — *"If about to write code without a failing test first, stop and write the test."* (Superpowers' `test-driven-development` skill enforces this anyway, but the redundancy is cheap.)
