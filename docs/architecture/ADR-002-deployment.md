@@ -34,4 +34,4 @@ Operational correctness (AI streaming works) is prioritised over platform simpli
 - Vercel: production branch = `main`, preview deployments on all PRs, `NEXT_PUBLIC_API_URL` points to Cloud Run service URL.
 
 ## Most Likely Failure Mode
-Cold start latency on Cloud Run (scale from 0 → 1 can take 2–5s). Mitigation: set min-instances=1 during active hours via Cloud Scheduler, or accept the cold start for a low-traffic MVP.
+Cold start latency on Cloud Run (scale from 0 → 1 can take 2–5s). **Decision:** accept the cold start for MVP (min-instances=0). At Doggies' expected traffic the cold start will be rare, and the cost of always-warm instances isn't justified. If latency complaints emerge post-launch, revisit with min-instances=1 via Cloud Scheduler during active hours.

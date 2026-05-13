@@ -1,8 +1,8 @@
 # Doggies — System Architecture Overview
 
-**Version:** 1.1  
-**Status:** Draft — DB decision pending (see ADR-003)  
-**Last Updated:** 2026-04-24
+**Version:** 1.3  
+**Status:** Active  
+**Last Updated:** 2026-05-13
 
 ---
 
@@ -20,14 +20,44 @@ Doggies is a platform for a dog shelter on Koh Phangan, Thailand, designed to:
 
 ## MVP Scope
 
-| Feature | Status |
-|---------|--------|
-| Telegram admin agent (voice-note DB updates) | MVP |
-| Public dog discovery page | MVP |
-| AI visitor chatbot (grounded, qualifying) | MVP |
-| Database setup | MVP |
-| Admin read-only dashboard (stats, leads) | MVP |
-| Donation link (external crowdfunding) | MVP |
+The MVP is split into three sequential phases, each independently deployable and testable.
+
+### MVP Phase 1 — Frontend Shell
+
+| Feature | Notes |
+|---------|-------|
+| Public dog discovery page | Placeholder/mock data |
+| Admin dashboard | Full UI with placeholder data; CRUD wired in Phase 2 |
+| Donation link | Static external link — no backend needed |
+
+**Deployment target:** Vercel (auto CI/CD via GitHub Actions)
+
+### MVP Phase 2 — Database Integration
+
+| Feature | Notes |
+|---------|-------|
+| Supabase setup (DB + Auth + Storage) | Schema, RLS policies, seed data |
+| Discovery page → Supabase | Real dog data via Supabase JS client |
+| Admin dashboard → Supabase | Full CRUD: dogs, leads, media via Supabase JS client |
+
+**Deployment target:** Vercel (no new infrastructure; Supabase is managed)
+
+### MVP Phase 3 — AI Chatbot
+
+| Feature | Notes |
+|---------|-------|
+| FastAPI backend | First backend deployment; Cloud Run CI/CD via GitHub Actions |
+| Visitor AI chatbot | Claude Tool Use, strict grounding contract (see ADR-004) |
+| Chatbot widget on discovery page | Streaming responses via SSE |
+| Adoption intent → admin notification | Chatbot calls `signal_adoption_intent` tool → Telegram alert |
+
+**Deployment target:** Google Cloud Run (new) + Vercel (updated)
+
+### Post-MVP Roadmap
+
+| Feature | Phase |
+|---------|-------|
+| Telegram admin agent (voice-note DB updates) | Phase 2 |
 | Instagram auto-posting | Phase 2 |
 | Instagram chatbot (top-of-funnel) | Phase 2 |
 | Dog sponsorship (recurring donations) | Phase 2 |
@@ -49,40 +79,34 @@ graph TD
         NextApp["Next.js App\n────────────────\n/dogs  → Discovery\n/chat  → AI Chatbot\n/admin → Dashboard"]
     end
 
-    subgraph cloudrun["☁️ Google Cloud Run"]
-        FastAPI["FastAPI\n────────────────\n/api/dogs\n/api/chat\n/api/admin\n/api/webhooks/telegram"]
+    subgraph cloudrun["☁️ Google Cloud Run (Phase 3)"]
+        FastAPI["FastAPI\n────────────────\n/api/chat"]
         VisitorAgent["Visitor Chatbot Agent\n(LangChain + Claude)\nGrounded Tool Use"]
-        AdminAgent["Telegram Admin Agent\n(LangChain + Claude)\nVoice → DB updates"]
         FastAPI --> VisitorAgent
-        FastAPI --> AdminAgent
     end
 
-    subgraph datastore["🗄️ Data — TBD (see ADR-003)"]
+    subgraph supabase["🗄️ Supabase"]
         PG[("PostgreSQL\n+ pgvector")]
-        MediaStore["Object Storage\n(Photos / Videos)"]
+        SupaStorage["Storage\n(Photos / Videos)"]
+        SupaAuth["Auth\n(Admin JWT)"]
     end
 
     subgraph external["External Services"]
         ClaudeAPI["Claude API\n(Anthropic)"]
-        Whisper["Whisper API\n(OpenAI)\nAudio transcription"]
-        TelegramAPI["Telegram Bot API"]
+        TelegramAPI["Telegram Bot API\n(Phase 3: adoption alerts)"]
         Crowdfund["Crowdfunding Site\n(External link only)"]
     end
 
-    Visitor -->|Browse / Chat| NextApp
-    Admin -->|Voice notes / Photos| TelegramAPI
-    NextApp -->|REST API| FastAPI
-    TelegramAPI -->|Webhook| FastAPI
-    FastAPI -->|CRUD| PG
-    FastAPI -->|Upload / Serve| MediaStore
+    Visitor -->|Browse| NextApp
+    Admin -->|Dashboard CRUD| NextApp
+    NextApp -->|Supabase JS: dog CRUD| PG
+    NextApp -->|Supabase JS: media| SupaStorage
+    NextApp -->|Supabase JS: auth| SupaAuth
+    NextApp -->|Phase 3: POST /api/chat| FastAPI
     VisitorAgent -->|Inference| ClaudeAPI
     VisitorAgent -->|Tool: query dogs| PG
-    AdminAgent -->|Inference| ClaudeAPI
-    AdminAgent -->|Transcribe audio| Whisper
-    AdminAgent -->|Tool: write dogs| PG
-    AdminAgent -->|Store media| MediaStore
-    FastAPI -->|Notify + reply| TelegramAPI
-    TelegramAPI -->|Confirmation + alerts| Admin
+    FastAPI -->|Phase 3: adoption alert| TelegramAPI
+    TelegramAPI -->|Notification| Admin
     Visitor -. "Donate (external)" .-> Crowdfund
 ```
 
@@ -93,69 +117,52 @@ graph TD
 ### Next.js App (Vercel)
 - Server-side rendered public dog discovery (SEO-friendly)
 - AI chatbot widget (streaming responses)
-- Admin read-only dashboard: dog list, adopter leads, engagement stats
+- Admin dashboard: dog list + inline editing, adopter leads + inline editing, chatbot conversation viewer, media upload
 - Image/video display via `next/image`
 
-### FastAPI Backend (Cloud Run)
-- All business logic and data access
-- Dog CRUD endpoints
-- Media upload handling
-- Visitor chat endpoint (proxies to Visitor Chatbot Agent)
-- Telegram webhook receiver (proxies to Telegram Admin Agent)
-- Adoption intent detection → Telegram alert to admin
+### FastAPI Backend (Cloud Run) — Phase 3 only
+- Chat endpoint `/api/chat` (proxies to Visitor Chatbot Agent)
+- No CRUD endpoints — all dog/lead/media CRUD goes through Supabase JS client from Next.js
 
-### Visitor Chatbot Agent
+### Visitor Chatbot Agent — Phase 3 only
 - Receives visitor message + conversation history
 - Uses Claude Tool Use (strict two-layer grounding contract — see ADR-004)
 - Only surfaces dog-specific facts from tool results; never fabricates
 - Qualifies adopters; helps visitors understand if they're a good fit
-- Triggers Telegram admin notification on adoption intent
+- Calls `signal_adoption_intent` tool → FastAPI dispatches Telegram alert to admin
 
-### Telegram Admin Agent
-- Receives voice notes, photos, and text from the shelter admin via Telegram
-- Transcribes voice audio via Whisper API
-- Extracts intent and structured data (new dog, status update, diary post)
-- Asks clarifying questions if info is incomplete
-- Writes to DB via write tools; stores media in object storage
-- Confirms each action back to admin via Telegram reply
-- See [ADR-006](ADR-006-telegram-admin-agent.md) for full design
+### Admin Dashboard (Next.js)
+- View all dogs with status + last update date; inline-edit any dog field
+- View all adopter leads with contact info + last status; inline-edit status and notes
+- View last N chatbot conversations (default 10, configurable) — Phase 3
+- Upload photos and videos to a dog's media gallery
+- Primary write interface for the admin in MVP (Telegram admin agent deferred to Phase 2 roadmap)
 
-### Admin Dashboard (Next.js, read-only)
-- View all dogs with current status
-- View adopter leads and their funnel stage
-- View recent chatbot conversations (anonymised)
-- No data entry — all updates go through the Telegram Admin Agent
-
-### Database (Proposed: Supabase — see ADR-003)
-- PostgreSQL: dogs, media, updates, adopter leads, chat sessions, admin Telegram sessions
+### Database (Supabase — see ADR-003)
+- PostgreSQL: dogs, media, updates, adopter leads, chat sessions
+- RLS (Row Level Security) policies required — Next.js accesses Supabase directly from the browser
 - pgvector: ready for Phase 2 semantic search
-- Auth: admin JWT
+- Auth: Supabase Auth (admin JWT)
 - Storage: photos and videos
 
 ---
 
 ## Data Flow: Key Scenarios
 
-### 1. Admin Adds a New Dog (via Telegram voice note)
+### 1. Admin Adds a New Dog (via Dashboard)
 ```
-Admin sends voice note: "New dog, female, small, 2 years, mixed breed, 
-                         very shy, name is Luna, not vaccinated yet"
-  → Telegram Bot receives audio file
-  → FastAPI /api/webhooks/telegram
-  → Whisper API transcribes audio
-  → Admin Agent extracts: {name: Luna, gender: female, size: small, 
-                            age: 2, traits: ["shy"], vaccinated: false}
-  → Admin Agent calls: create_dog(...)
-  → PostgreSQL insert
-  → Admin Agent replies via Telegram: "✅ Luna added as available"
+Admin opens /admin/dogs (Next.js)
+  → Fills form: name, breed, age, gender, size, traits, health status
+  → Supabase JS client: INSERT INTO dogs (RLS validates admin JWT)
+  → Uploads photo via Supabase Storage JS client
+  → Dog immediately visible on /dogs discovery page
 ```
 
 ### 2. Visitor Discovers Dogs
 ```
 Visitor loads /dogs (Next.js SSR)
-  → GET /api/dogs (FastAPI)
-  → Query PostgreSQL (status = available)
-  → Return dog list with media URLs
+  → Supabase JS client: SELECT * FROM dogs WHERE status = 'available'
+  → Returns dog list with Supabase Storage media URLs
   → Renders dog cards with photos
 ```
 
@@ -185,19 +192,19 @@ Visitor: "I'd love to meet Bella"
 
 ## Technology Summary
 
-| Layer | Technology | Hosting |
-|-------|-----------|---------|
-| Frontend | Next.js 15 (App Router) | Vercel |
-| Backend | FastAPI (Python 3.12) | Google Cloud Run |
-| Visitor AI Agent | LangChain + Claude API | Inside Cloud Run |
-| Telegram Admin Agent | LangChain + Claude API + Whisper | Inside Cloud Run |
-| Audio Transcription | OpenAI Whisper API | External (SaaS) |
-| Database | PostgreSQL + pgvector | TBD (see ADR-003) |
-| Media Storage | Object storage | TBD (see ADR-003) |
-| Notifications + Admin input | Telegram Bot API | External (managed) |
-| Auth | JWT (admin only) | FastAPI |
-| Donations | External crowdfunding link | N/A |
-| Observability | TBD | Phase 3 |
+| Layer | Technology | Hosting | Phase |
+|-------|-----------|---------|-------|
+| Frontend | Next.js 15 (App Router) | Vercel | 1 |
+| DB access (CRUD + Auth + Storage) | Supabase JS Client | Next.js (Vercel) | 2 |
+| Database | PostgreSQL + pgvector | Supabase | 2 |
+| Media Storage | Supabase Storage | Supabase | 2 |
+| Auth | Supabase Auth (JWT) | Supabase | 2 |
+| Backend (AI only) | FastAPI (Python 3.12) | Google Cloud Run | 3 |
+| Visitor AI Agent | LangChain + Claude API | Inside Cloud Run | 3 |
+| Adoption notifications | Telegram Bot API | External (managed) | 3 |
+| Donations | External crowdfunding link | N/A | 1 |
+| Telegram Admin Agent | LangChain + Claude API + Whisper | Cloud Run | Phase 2 roadmap |
+| Observability | TBD | TBD | Phase 3+ |
 
 ---
 
@@ -207,7 +214,7 @@ Visitor: "I'd love to meet Bella"
 |-----|----------|--------|
 | [ADR-001](ADR-001-tech-stack.md) | FastAPI + Next.js as primary stack | Accepted |
 | [ADR-002](ADR-002-deployment.md) | Cloud Run (backend) + Vercel (frontend) | Accepted |
-| [ADR-003](ADR-003-database.md) | Supabase (PostgreSQL + Storage) | **Proposed** |
+| [ADR-003](ADR-003-database.md) | Supabase (PostgreSQL + Storage) | Accepted |
 | [ADR-004](ADR-004-ai-chatbot.md) | Claude Tool Use + strict grounding contract | Accepted |
-| [ADR-005](ADR-005-notifications.md) | Telegram for admin notifications | Accepted |
-| [ADR-006](ADR-006-telegram-admin-agent.md) | Telegram voice-note admin agent | Accepted |
+| [ADR-005](ADR-005-notifications.md) | Telegram for adoption intent alerts (Phase 3) | Accepted |
+| [ADR-006](ADR-006-telegram-admin-agent.md) | Telegram voice-note admin agent | Deferred (Phase 2 roadmap) |

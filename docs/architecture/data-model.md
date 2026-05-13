@@ -201,6 +201,18 @@ Session ends (user leaves / idle 30 min timeout)
   → ChatSession.ended_at set
 ```
 
+**Retention policy:**
+ChatSessions are deleted when the associated Visitor has not returned in 30+ days (`Visitor.last_seen < NOW() - INTERVAL '30 days'`). The `Visitor` record itself and any `AdopterLead` linked to it are kept — only the raw chat history is purged.
+
+Implementation: a scheduled cleanup job (Vercel cron function or Cloud Scheduler hitting a FastAPI endpoint) runs daily and executes:
+```sql
+DELETE FROM chat_sessions
+WHERE visitor_id IN (
+  SELECT id FROM visitors
+  WHERE last_seen < NOW() - INTERVAL '30 days'
+);
+```
+
 **Context injection on return:**
 ```
 "Returning visitor context:
@@ -230,6 +242,29 @@ Created when a visitor identifies themselves (provides name and contact). Promot
 
 **Visitor → Lead promotion:**
 When the chatbot collects the visitor's name and contact (e.g., "What's your Telegram so the admin can reach you?"), the system creates an `AdopterLead` linked to the existing `Visitor`. All previous conversation history is automatically associated via the `visitor_id` chain.
+
+---
+
+### TelegramSession
+
+Stateful session for the Telegram admin agent. Persists multi-turn clarification conversations so the agent can resume if the admin's message is ambiguous (e.g. "update the brown dog" when there are multiple).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | UUID | Primary key |
+| `admin_telegram_id` | string | Admin's Telegram chat ID (from env var) |
+| `messages` | JSON | Array of `{role, content, timestamp}` |
+| `intent_state` | enum | `pending` \| `resolved` \| `abandoned` |
+| `current_intent` | enum | `create_dog` \| `update_dog` \| `add_dog_update` \| `store_media` \| `null` |
+| `partial_data` | JSONB | Partially collected dog/update data gathered so far |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | Updated on every agent turn |
+
+**Session lifecycle:**
+- Created when the admin sends a message the agent cannot resolve without clarification.
+- Destroyed (state set to `resolved`) once all required fields are collected and the DB write succeeds.
+- Set to `abandoned` after 30 minutes of inactivity.
+- One active session per admin at a time — a new message while a session is `pending` continues the existing session rather than opening a new one.
 
 ---
 

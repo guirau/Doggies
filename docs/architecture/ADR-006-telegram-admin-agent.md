@@ -1,7 +1,7 @@
 # ADR-006: Telegram Admin Agent — Voice-Note DB Updates
 
 ## Status
-Accepted
+Deferred — Phase 2 roadmap (post-MVP)
 
 ## Context
 The shelter is run by a single person who is already overwhelmed with operational tasks. A traditional web admin panel requires the admin to open a browser, log in, navigate to the right dog, and fill out a form — a workflow that will be abandoned under pressure.
@@ -83,7 +83,12 @@ Admin (Telegram)
 ## Consequences
 - **Positive:** Eliminates the admin compliance problem. Updates happen in the flow of the admin's day. Voice is the lowest-friction interface. Photos upload directly from Telegram — no separate upload step.
 - **Negative:** New dependency on Whisper API (or Google Speech-to-Text). Multi-turn clarification conversations require stateful session management in the agent.
-- **Web admin panel:** Still built, but its role shifts. It becomes a **read-only dashboard** showing dog listings, lead status, and engagement stats. The admin uses it occasionally for overview, not for daily data entry.
+- **Web admin panel:** Still built, but its role is complementary, not primary. The Telegram agent is the admin's day-to-day interface. The dashboard serves as a **write-capable management interface** for deliberate, structured edits:
+  - View all dogs with status + last update date; inline-edit any dog field
+  - View all adopter leads with contact info + last status; inline-edit lead status and notes
+  - View the last N chatbot conversations (default 10, configurable)
+  - Upload photos and videos directly to a dog's media gallery
+  The dashboard is not a replacement for the Telegram agent — it's the "sit down and review" interface vs. Telegram's "update on the go" interface.
 
 ## Audio Transcription
 | Option | Cost | Accuracy | Setup |

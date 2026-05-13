@@ -95,7 +95,9 @@ This builds trust, reduces bad-fit adoptions (which result in returns), and serv
 ## Implementation Notes
 - Tools are plain Python functions passed to the Claude API as tool definitions (or LangChain `@tool`).
 - Tool descriptions must be precise — Claude uses them to decide when to call each one.
-- Adoption intent detection: if the conversation reaches clear adoption interest, FastAPI dispatches a Telegram notification to the admin. This is a post-processing step, not a tool.
+- Adoption intent detection: Claude calls a dedicated `signal_adoption_intent(dog_id: str | None, visitor_message: str)` tool when it judges the visitor is ready to adopt or meet a dog. FastAPI's tool handler dispatches the Telegram notification to the admin. Claude decides when to call it — this keeps the signal close to the reasoning rather than a post-processing guess.
+  - `dog_id` is nullable: set if the visitor has a specific dog in mind, null if intent is general.
+  - `visitor_message` is a short summary of what the visitor said, included in the admin notification.
 - Conversation history stored in `ChatSession.messages` (JSON). Max 10 turns retained in context window.
 - Log every tool call with inputs and outputs for debugging and weekly review.
 

@@ -42,4 +42,4 @@ The developer is a solo dev deploying on Cloud Run + Vercel. Preference is for m
 Developer velocity and unified tooling are prioritised over GCP-native integration. If the project scales significantly, Cloud SQL + Cloud Storage is the natural migration path.
 
 ## Most Likely Failure Mode
-Supabase Storage 50MB file size limit for individual uploads. Mitigation: for videos, implement client-side chunked uploads or direct-to-storage signed URLs. Alternatively, cap video uploads at 50MB in the admin panel with a clear error message.
+Supabase Storage 50MB file size limit for individual uploads. **Decision:** cap video uploads at 50MB for MVP. The admin panel and Telegram agent will reject files over 50MB with a clear error message ("Video too large — max 50MB. Compress and retry."). Chunked uploads are deferred to Phase 2 if the shelter routinely needs to upload larger files.
