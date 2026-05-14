@@ -11,16 +11,16 @@ Project-level configuration referenced by `CLAUDE.md`. This file answers the que
 **Deployment targets:**
 
 * Frontend: Vercel (auto CI/CD via GitHub Actions on merge to `main`; preview deployments on every PR)
-* Backend: Google Cloud Run (containerised FastAPI; CI/CD via GitHub Actions on merge to `main`) — Phase 3+
+* Backend: Google Cloud Run (containerised FastAPI; CI/CD via GitHub Actions on merge to `main`) — MVP Phase 0.3+
 * Other: N/A
 
 ## 2. Stack
 
-**Backend (Phase 3+):**
+**Backend (MVP Phase 0.3+):**
 
 * Language: Python 3.12
 * Framework: FastAPI
-* Dependency file: `pyproject.toml` (package manager TBD when Phase 3 begins)
+* Dependency file: `pyproject.toml` (package manager TBD when MVP Phase 0.3 begins)
 
 **Frontend:**
 
@@ -32,8 +32,8 @@ Project-level configuration referenced by `CLAUDE.md`. This file answers the que
 
 **Other key runtime dependencies:**
 
-* LangChain + Anthropic Claude API — AI chatbot agent (Phase 3+)
-* Telegram Bot API — adoption intent notifications (Phase 3) and admin agent (post-MVP)
+* LangChain + Anthropic Claude API — AI chatbot agent (MVP Phase 0.3+)
+* Telegram Bot API — adoption intent notifications (MVP Phase 0.3) and admin agent (post-MVP)
 * OpenAI Whisper API — voice transcription for Telegram admin agent (post-MVP)
 
 ## 3. External services (vendor list)
@@ -42,9 +42,9 @@ This list is referenced by the swap test in `CLAUDE.md` Section 6. Vendor SDK im
 
 | Service category          | Vendor                | Package name(s) to watch                                    | Phase    |
 | ------------------------- | --------------------- | ----------------------------------------------------------- | -------- |
-| LLM inference             | Anthropic Claude      | `anthropic`, `langchain-anthropic`                      | Phase 3+ |
-| Database / Auth / Storage | Supabase              | `@supabase/supabase-js` (frontend), `supabase` (Python) | Phase 2+ |
-| Notifications             | Telegram Bot API      | direct HTTP — no SDK; if adopted:`python-telegram-bot`   | Phase 3+ |
+| LLM inference             | Anthropic Claude      | `anthropic`, `langchain-anthropic`                      | MVP Phase 0.3+ |
+| Database / Auth / Storage | Supabase              | `@supabase/supabase-js` (frontend), `supabase` (Python) | MVP Phase 0.2+ |
+| Notifications             | Telegram Bot API      | direct HTTP — no SDK; if adopted:`python-telegram-bot`   | MVP Phase 0.3+ |
 | Voice transcription       | OpenAI Whisper API    | `openai`                                                  | Post-MVP |
 | Payments                  | Stripe or Omise (TBD) | `stripe` or `omise`                                     | Post-MVP |
 | Social posting            | Meta Graph API        | direct HTTP — no SDK                                       | Post-MVP |
@@ -55,11 +55,11 @@ If a vendor SDK import from any package in the "Package name(s) to watch" column
 
 **Test frameworks:**
 
-* Frontend unit/integration: TBD — to be decided when Phase 1 begins
-* Backend unit/integration: pytest (Python standard; to be confirmed when Phase 3 begins)
+* Frontend unit/integration: TBD — to be decided when MVP Phase 0.1 begins
+* Backend unit/integration: pytest (Python standard; to be confirmed when MVP Phase 0.3 begins)
 * End-to-end: Playwright (decided by project testing rules)
 
-**Test commands:** TBD — fill in when Phase 1 project is initialised.
+**Test commands:** TBD — fill in when MVP Phase 0.1 project is initialised.
 
 **Coverage policy:** No percentage target. Each requirement ID in `REQUIREMENTS.md` must have at least one test that can confirm it passes. "Implemented" is not done; a passing test or verified Playwright check is done.
 
@@ -91,8 +91,8 @@ Most relevant to this project:
 
 | Skill                  | Purpose                                               |
 | ---------------------- | ----------------------------------------------------- |
-| `fastapi-expert`     | FastAPI patterns and best practices (Phase 3 backend) |
-| `nextjs-developer`   | Next.js App Router patterns (Phase 1+)                |
+| `fastapi-expert`     | FastAPI patterns and best practices (MVP Phase 0.3 backend) |
+| `nextjs-developer`   | Next.js App Router patterns (MVP Phase 0.1+)                |
 | `typescript-pro`     | TypeScript patterns and idioms                        |
 | `python-pro`         | Python patterns and idioms                            |
 | `postgres-pro`       | PostgreSQL query and schema patterns                  |
@@ -144,8 +144,8 @@ Project-scope agents live in `.claude/agents/`. Each runs as a sub-agent with it
 
 **Code style:**
 
-* TypeScript/frontend: Prettier + ESLint (configuration TBD when Phase 1 begins)
-* Python/backend: Black + Ruff (configuration TBD when Phase 3 begins)
+* TypeScript/frontend: Prettier + ESLint (configuration TBD when MVP Phase 0.1 begins)
+* Python/backend: Black + Ruff (configuration TBD when MVP Phase 0.3 begins)
 
 **Commit message style:** Conventional Commits — types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`
 

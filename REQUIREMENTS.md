@@ -21,7 +21,7 @@
 | `UI` | User-facing interface and rendering |
 | `DATA` | Database schema, RLS, seeding, state machines |
 | `MEDIA` | Photo and video upload, storage, retrieval |
-| `API` | HTTP endpoints and contracts (FastAPI, Phase 3) |
+| `API` | HTTP endpoints and contracts (FastAPI, MVP Phase 0.3) |
 | `AI` | AI chatbot agent behaviour and grounding contract |
 | `NOTIF` | Notifications (Telegram adoption alerts) |
 | `AGENT` | Telegram admin agent (voice/text DB updates) |
@@ -35,7 +35,7 @@
 
 ---
 
-## Phase 1 — Frontend Shell
+## MVP Phase 0.1 — Frontend Shell
 
 > Goal: Live deployed frontend on Vercel with placeholder data. No backend, no database.
 
@@ -55,7 +55,7 @@
 |----|-------------|-------|
 | UI-01 | `/dogs` renders a grid of dog cards; each card shows name, breed, size, and a primary photo placeholder | v1 |
 | UI-02 | `/dogs/[id]` renders an individual dog profile with bio, photo gallery placeholder, and diary placeholder | v1 |
-| UI-03 | Filter bar on `/dogs` renders controls for size, gender, and personality traits (UI only — no logic in Phase 1) | v1 |
+| UI-03 | Filter bar on `/dogs` renders controls for size, gender, and personality traits (UI only — no logic in MVP Phase 0.1) | v1 |
 | UI-04 | `/dogs` is server-side rendered (no `"use client"` at the page level) | v1 |
 | UI-05 | All mock dog data lives in a single fixture file; no hardcoded values scattered across components | v1 |
 
@@ -66,8 +66,8 @@
 | UI-06 | `/admin/dogs` renders a list of dogs with status badge and last-updated date | v1 |
 | UI-07 | `/admin/dogs/new` renders a dog creation form with all fields: name, breed, age, gender, size, traits, health status | v1 |
 | UI-08 | `/admin/leads` renders a list of adopter leads with contact handle, contact type, and status | v1 |
-| UI-09 | Media upload field renders in the dog form (non-functional in Phase 1; button present, no action) | v1 |
-| UI-10 | All admin UI uses placeholder/hardcoded data in Phase 1; no real API calls | v1 |
+| UI-09 | Media upload field renders in the dog form (non-functional in MVP Phase 0.1; button present, no action) | v1 |
+| UI-10 | All admin UI uses placeholder/hardcoded data in MVP Phase 0.1; no real API calls | v1 |
 
 ### UI — Donation
 
@@ -75,14 +75,14 @@
 |----|-------------|-------|
 | UI-11 | A prominent donation section is visible on the public-facing homepage or discovery page | v1 |
 | UI-12 | The donation CTA links to the external crowdfunding page and opens in a new tab | v1 |
-| UI-13 | No payment processing, no payment credentials, and no payment SDK are present in Phase 1 | v1 |
+| UI-13 | No payment processing, no payment credentials, and no payment SDK are present in MVP Phase 0.1 | v1 |
 
 ---
 
-## Phase 2 — Database Integration
+## MVP Phase 0.2 — Database Integration
 
 > Goal: Replace all mock data with real Supabase data. Admin can manage dogs and leads from the dashboard.
-> **Prerequisite:** Phase 1 complete and deployed.
+> **Prerequisite:** MVP Phase 0.1 complete and deployed.
 
 ### INFRA — Supabase Setup
 
@@ -147,10 +147,10 @@
 
 ---
 
-## Phase 3 — AI Chatbot
+## MVP Phase 0.3 — AI Chatbot
 
 > Goal: Grounded AI chatbot on the discovery page that answers visitor questions and notifies admin of adoption intent.
-> **Prerequisite:** Phase 2 complete.
+> **Prerequisite:** MVP Phase 0.2 complete.
 > **New infrastructure:** FastAPI on Google Cloud Run.
 
 ### INFRA — FastAPI and Cloud Run
@@ -224,7 +224,7 @@
 | AGENT-06 | An active session is abandoned after 30 minutes of inactivity | v2 | |
 | AGENT-07 | Admin receives a confirmation message after a successful DB write | v2 | |
 
-**Depends on:** Phase 3 deployed (Cloud Run + Telegram bot infrastructure exists).
+**Depends on:** MVP Phase 0.3 deployed (Cloud Run + Telegram bot infrastructure exists).
 **See:** `docs/architecture/ADR-006-telegram-admin-agent.md`
 
 ---
@@ -238,7 +238,7 @@
 | FORM-03 | Admin sees structured form data alongside the lead in `/admin/leads` | v2 |
 | FORM-04 | Form includes basic validation; required fields cannot be submitted empty | v2 |
 
-**Depends on:** Phase 2 (Supabase + leads table).
+**Depends on:** MVP Phase 0.2 (Supabase + leads table).
 
 ---
 
@@ -250,7 +250,7 @@
 | FEED-02 | Feed is paginated or infinite-scroll; at least 20 items per page | v2 |
 | FEED-03 | Each feed entry shows: dog name (linked to dog profile), update type, content text, and date | v2 |
 
-**Depends on:** Phase 2 (`dog_updates` table populated).
+**Depends on:** MVP Phase 0.2 (`dog_updates` table populated).
 
 ---
 
@@ -263,7 +263,7 @@
 | SOCIAL-03 | Integration uses Meta Graph API connected to a Business account | v2 | Meta App Review required — allow 2–4 weeks |
 | SOCIAL-04 | Meta App Review is completed and approved before this feature is shipped | v2 | Start approval process early |
 
-**Depends on:** Phase 2 (dog creation flow exists).
+**Depends on:** MVP Phase 0.2 (dog creation flow exists).
 
 ---
 
@@ -275,7 +275,7 @@
 | SOCIAL-06 | Chatbot uses the same AI agent backend as the web chatbot (`/api/chat` or equivalent) | v2 | |
 | SOCIAL-07 | Integration delivered via Meta Messaging API or ManyChat webhooks | v2 | ManyChat is the lower-friction path |
 
-**Depends on:** Phase 3 (AI agent backend deployed).
+**Depends on:** MVP Phase 0.3 (AI agent backend deployed).
 
 ---
 
@@ -288,7 +288,7 @@
 | BOOKING-03 | Admin receives the meeting request via Telegram | v2 |
 | BOOKING-04 | Admin can confirm or decline the request; visitor receives confirmation | v2 |
 
-**Depends on:** Phase 2 (leads table); optionally Phase 3 (chatbot can surface the CTA).
+**Depends on:** MVP Phase 0.2 (leads table); optionally MVP Phase 0.3 (chatbot can surface the CTA).
 
 ---
 
@@ -302,7 +302,7 @@
 | PAYMENT-04 | Recurring billing is managed by the payment provider; cancellation is available to the sponsor | v2 | |
 | PAYMENT-05 | No payment card data is stored in Supabase; only payment provider customer/subscription IDs | v2 | |
 
-**Depends on:** Phase 2. Requires business account and payment provider onboarding.
+**Depends on:** MVP Phase 0.2. Requires business account and payment provider onboarding.
 
 ---
 

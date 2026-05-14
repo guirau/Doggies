@@ -13,6 +13,8 @@ Before starting any non-trivial task in this project, read the following documen
 * `REQUIREMENTS.md` — stable requirement IDs with scope labels (`v1` / `v2` / `out-of-scope`). Use these IDs when writing tests, ADRs, and PR descriptions.
 * `docs/learnings.md` — root causes and fixes from earlier development. **Read before starting any feature.** **Write before marking any task done** if the work involved a fix, a surprising discovery, or a non-obvious correct approach. Use the template in `docs/learnings.md` (title, date, phase, area, what happened, root cause, fix). Record the root cause and the specific fix — not just "it's fixed". File paths, package versions, error messages, and commands belong in the entry. Do not record general programming advice; only lessons specific to this project and stack.
 
+**Do not read:** `WORKFLOW.md` is a personal reference file maintained by the user. It is not a project rule and reading it will mislead Claude. Skip it. (Reads on this path are also blocked at the tool layer via `.claude/settings.local.json`.)
+
 ## 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**

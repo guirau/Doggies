@@ -9,30 +9,30 @@ MVP features are ordered by build phase. Backlog items are numbered in suggested
 
 ## MVP Features
 
-### Phase 1 — Donation Link
+### MVP Phase 0.1 — Donation Link
 
 - A prominent "Donate" button or section on the public site
 - Links to the existing external crowdfunding page
 - No payment integration in MVP
 
-### Phase 1–2 — Admin Panel
+### MVP Phases 0.1–0.2 — Admin Panel
 
-- UI shell with placeholder data (Phase 1)
-- Post a new dog: name, breed, age, gender, size, personality traits, health status (Phase 2)
-- Upload photos and videos for each dog (Phase 2)
-- Post diary updates for a dog: health, mood, activity, milestones (Phase 2)
-- View list of adopter leads and their status (Phase 2)
-- Mark a dog's status: available / fostered / adopted / medical hold (Phase 2)
+- UI shell with placeholder data (MVP Phase 0.1)
+- Post a new dog: name, breed, age, gender, size, personality traits, health status (MVP Phase 0.2)
+- Upload photos and videos for each dog (MVP Phase 0.2)
+- Post diary updates for a dog: health, mood, activity, milestones (MVP Phase 0.2)
+- View list of adopter leads and their status (MVP Phase 0.2)
+- Mark a dog's status: available / fostered / adopted / medical hold (MVP Phase 0.2)
 
-### Phase 1–2 — Public Dog Discovery Page
+### MVP Phases 0.1–0.2 — Public Dog Discovery Page
 
-- UI shell with placeholder data (Phase 1)
-- Grid of available dogs with primary photo, name, breed, size (Phase 2)
-- Individual dog profile page with full bio, photo gallery, diary updates (Phase 2)
-- Filter by size, gender, personality traits (Phase 2)
-- "I'm interested in adopting" CTA → opens chatbot (Phase 3)
+- UI shell with placeholder data (MVP Phase 0.1)
+- Grid of available dogs with primary photo, name, breed, size (MVP Phase 0.2)
+- Individual dog profile page with full bio, photo gallery, diary updates (MVP Phase 0.2)
+- Filter by size, gender, personality traits (MVP Phase 0.2)
+- "I'm interested in adopting" CTA → opens chatbot (MVP Phase 0.3)
 
-### Phase 3 — AI Chatbot
+### MVP Phase 0.3 — AI Chatbot
 
 - Natural language Q&A about dogs ("Which dogs are good with kids?")
 - Dog-specific questions ("Tell me about Max's health status")

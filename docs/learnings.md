@@ -25,7 +25,7 @@ Copy this template and fill it in:
 ```
 ### [Short title describing what happened]
 **Date:** YYYY-MM-DD
-**Phase:** Phase 1 / Phase 2 / Phase 3 / Backlog
+**Phase:** MVP Phase 0.1 / MVP Phase 0.2 / MVP Phase 0.3 / Post-MVP
 **Area:** e.g. Supabase · Next.js · Cloud Run · LangChain · CI/CD · Testing
 **What happened:** [Symptom or discovery — what broke or surprised us]
 **Root cause:** [Why it happened]
@@ -36,7 +36,7 @@ Copy this template and fill it in:
 
 ## Learnings
 
-> No entries yet — development has not started. The first entries will be added during Phase 1.
+> No entries yet — development has not started. The first entries will be added during MVP Phase 0.1.
 
 <!-- 
 ENTRIES GO BELOW THIS LINE.

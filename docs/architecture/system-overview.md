@@ -22,17 +22,17 @@ Doggies is a platform for a dog shelter on Koh Phangan, Thailand, designed to:
 
 The MVP is split into three sequential phases, each independently deployable and testable.
 
-### MVP Phase 1 — Frontend Shell
+### MVP Phase 0.1 — Frontend Shell
 
 | Feature | Notes |
 |---------|-------|
 | Public dog discovery page | Placeholder/mock data |
-| Admin dashboard | Full UI with placeholder data; CRUD wired in Phase 2 |
+| Admin dashboard | Full UI with placeholder data; CRUD wired in MVP Phase 0.2 |
 | Donation link | Static external link — no backend needed |
 
 **Deployment target:** Vercel (auto CI/CD via GitHub Actions)
 
-### MVP Phase 2 — Database Integration
+### MVP Phase 0.2 — Database Integration
 
 | Feature | Notes |
 |---------|-------|
@@ -42,7 +42,7 @@ The MVP is split into three sequential phases, each independently deployable and
 
 **Deployment target:** Vercel (no new infrastructure; Supabase is managed)
 
-### MVP Phase 3 — AI Chatbot
+### MVP Phase 0.3 — AI Chatbot
 
 | Feature | Notes |
 |---------|-------|
@@ -79,7 +79,7 @@ graph TD
         NextApp["Next.js App\n────────────────\n/dogs  → Discovery\n/chat  → AI Chatbot\n/admin → Dashboard"]
     end
 
-    subgraph cloudrun["☁️ Google Cloud Run (Phase 3)"]
+    subgraph cloudrun["☁️ Google Cloud Run (MVP Phase 0.3)"]
         FastAPI["FastAPI\n────────────────\n/api/chat"]
         VisitorAgent["Visitor Chatbot Agent\n(LangChain + Claude)\nGrounded Tool Use"]
         FastAPI --> VisitorAgent
@@ -93,7 +93,7 @@ graph TD
 
     subgraph external["External Services"]
         ClaudeAPI["Claude API\n(Anthropic)"]
-        TelegramAPI["Telegram Bot API\n(Phase 3: adoption alerts)"]
+        TelegramAPI["Telegram Bot API\n(MVP Phase 0.3: adoption alerts)"]
         Crowdfund["Crowdfunding Site\n(External link only)"]
     end
 
@@ -102,10 +102,10 @@ graph TD
     NextApp -->|Supabase JS: dog CRUD| PG
     NextApp -->|Supabase JS: media| SupaStorage
     NextApp -->|Supabase JS: auth| SupaAuth
-    NextApp -->|Phase 3: POST /api/chat| FastAPI
+    NextApp -->|MVP Phase 0.3: POST /api/chat| FastAPI
     VisitorAgent -->|Inference| ClaudeAPI
     VisitorAgent -->|Tool: query dogs| PG
-    FastAPI -->|Phase 3: adoption alert| TelegramAPI
+    FastAPI -->|MVP Phase 0.3: adoption alert| TelegramAPI
     TelegramAPI -->|Notification| Admin
     Visitor -. "Donate (external)" .-> Crowdfund
 ```
@@ -120,11 +120,11 @@ graph TD
 - Admin dashboard: dog list + inline editing, adopter leads + inline editing, chatbot conversation viewer, media upload
 - Image/video display via `next/image`
 
-### FastAPI Backend (Cloud Run) — Phase 3 only
+### FastAPI Backend (Cloud Run) — MVP Phase 0.3 only
 - Chat endpoint `/api/chat` (proxies to Visitor Chatbot Agent)
 - No CRUD endpoints — all dog/lead/media CRUD goes through Supabase JS client from Next.js
 
-### Visitor Chatbot Agent — Phase 3 only
+### Visitor Chatbot Agent — MVP Phase 0.3 only
 - Receives visitor message + conversation history
 - Uses Claude Tool Use (strict two-layer grounding contract — see ADR-004)
 - Only surfaces dog-specific facts from tool results; never fabricates
@@ -134,7 +134,7 @@ graph TD
 ### Admin Dashboard (Next.js)
 - View all dogs with status + last update date; inline-edit any dog field
 - View all adopter leads with contact info + last status; inline-edit status and notes
-- View last N chatbot conversations (default 10, configurable) — Phase 3
+- View last N chatbot conversations (default 10, configurable) — MVP Phase 0.3
 - Upload photos and videos to a dog's media gallery
 - Primary write interface for the admin in MVP (Telegram admin agent deferred to Phase 2 roadmap)
 
@@ -192,19 +192,7 @@ Visitor: "I'd love to meet Bella"
 
 ## Technology Summary
 
-| Layer | Technology | Hosting | Phase |
-|-------|-----------|---------|-------|
-| Frontend | Next.js 15 (App Router) | Vercel | 1 |
-| DB access (CRUD + Auth + Storage) | Supabase JS Client | Next.js (Vercel) | 2 |
-| Database | PostgreSQL + pgvector | Supabase | 2 |
-| Media Storage | Supabase Storage | Supabase | 2 |
-| Auth | Supabase Auth (JWT) | Supabase | 2 |
-| Backend (AI only) | FastAPI (Python 3.12) | Google Cloud Run | 3 |
-| Visitor AI Agent | LangChain + Claude API | Inside Cloud Run | 3 |
-| Adoption notifications | Telegram Bot API | External (managed) | 3 |
-| Donations | External crowdfunding link | N/A | 1 |
-| Telegram Admin Agent | LangChain + Claude API + Whisper | Cloud Run | Phase 2 roadmap |
-| Observability | TBD | TBD | Phase 3+ |
+For the technology stack, vendor SDKs, and package names, see [`PROJECT.md`](../../PROJECT.md) — Section 2 (Stack) and Section 3 (External services). For phased build order and deployment timing, see [`ROADMAP.md`](../../ROADMAP.md). This document focuses on architecture and data flow; it does not maintain a separate stack table to avoid drift.
 
 ---
 
@@ -216,5 +204,5 @@ Visitor: "I'd love to meet Bella"
 | [ADR-002](ADR-002-deployment.md) | Cloud Run (backend) + Vercel (frontend) | Accepted |
 | [ADR-003](ADR-003-database.md) | Supabase (PostgreSQL + Storage) | Accepted |
 | [ADR-004](ADR-004-ai-chatbot.md) | Claude Tool Use + strict grounding contract | Accepted |
-| [ADR-005](ADR-005-notifications.md) | Telegram for adoption intent alerts (Phase 3) | Accepted |
+| [ADR-005](ADR-005-notifications.md) | Telegram for adoption intent alerts (MVP Phase 0.3) | Accepted |
 | [ADR-006](ADR-006-telegram-admin-agent.md) | Telegram voice-note admin agent | Deferred (Phase 2 roadmap) |

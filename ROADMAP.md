@@ -19,7 +19,7 @@ This file is the single source of truth for build order and project state.
 
 ## Current State
 
-> **Where we are:** Planning complete. No code written yet. Ready to begin Phase 1 (frontend shell).
+> **Where we are:** Planning complete. No code written yet. Ready to begin MVP Phase 0.1 (frontend shell).
 
 Planning artifacts completed:
 - [x] Feature set defined (`docs/prd/features-proposal.md`)
@@ -36,7 +36,7 @@ The MVP is three sequential phases. Each phase is independently deployable.
 
 ---
 
-### Phase 1 — Frontend Shell
+### MVP Phase 0.1 — Frontend Shell
 
 **Goal:** A live, deployed frontend on Vercel with placeholder data and CI/CD from GitHub. No backend, no database.
 
@@ -54,7 +54,7 @@ The MVP is three sequential phases. Each phase is independently deployable.
   - Dog list with status + last update date
   - Adopter leads list with contact info + status
   - Forms for adding/editing a dog (fields: name, breed, age, gender, size, traits, health)
-  - Media upload UI (non-functional in Phase 1)
+  - Media upload UI (non-functional in MVP Phase 0.1)
 - [ ] Donation section — prominent button linking to external crowdfunding page
 - [ ] Deploy and verify all routes render correctly on Vercel
 
@@ -62,11 +62,11 @@ The MVP is three sequential phases. Each phase is independently deployable.
 
 ---
 
-### Phase 2 — Database Integration
+### MVP Phase 0.2 — Database Integration
 
 **Goal:** Replace all mock data with real Supabase data. Admin can manage dogs and leads from the dashboard.
 
-**Prerequisite:** Phase 1 complete and deployed.  
+**Prerequisite:** MVP Phase 0.1 complete and deployed.  
 **Deployment:** No new infrastructure — Supabase is managed. Vercel auto-deploys.
 
 #### Deliverables
@@ -94,11 +94,11 @@ The MVP is three sequential phases. Each phase is independently deployable.
 
 ---
 
-### Phase 3 — AI Chatbot
+### MVP Phase 0.3 — AI Chatbot
 
 **Goal:** A grounded AI chatbot on the discovery page that answers visitor questions and notifies the admin of adoption intent.
 
-**Prerequisite:** Phase 2 complete.  
+**Prerequisite:** MVP Phase 0.2 complete.  
 **New infrastructure:** FastAPI on Google Cloud Run (first backend deployment).
 
 #### Deliverables
@@ -140,46 +140,46 @@ The MVP is three sequential phases. Each phase is independently deployable.
 
 Admin sends voice notes, text, or photos to a Telegram bot to update the database without opening the dashboard. Whisper API for transcription, LangChain agent with write tools.
 
-**Depends on:** Phase 3 (Cloud Run deployed, Telegram bot exists)  
+**Depends on:** MVP Phase 0.3 (Cloud Run deployed, Telegram bot exists)  
 **See:** [ADR-006](docs/architecture/ADR-006-telegram-admin-agent.md), `TelegramSession` table already in data model.
 
 ### B2 — Adoption Application Form
 
 Structured form for serious adopters (living situation, dog experience, home environment). Feeds into admin panel as a structured lead.
 
-**Depends on:** Phase 2 (Supabase wired)
+**Depends on:** MVP Phase 0.2 (Supabase wired)
 
 ### B3 — Dog Diary / Status Updates (Public Feed)
 
 Scrollable public timeline of recent updates across all dogs. Keeps donors and supporters engaged between visits.
 
-**Depends on:** Phase 2 (diary updates already in DB model)
+**Depends on:** MVP Phase 0.2 (diary updates already in DB model)
 
 ### B4 — Instagram Auto-Posting
 
 When admin posts a new dog, auto-generate an Instagram post (caption + primary photo). Requires Meta Graph API + Business account + App Review (allow 2–4 weeks lead time).
 
-**Depends on:** Phase 2  
+**Depends on:** MVP Phase 0.2  
 **Note:** Start the Meta App Review process early — it is the long pole.
 
 ### B5 — Virtual or In-Person Meet Booking
 
 Visitor requests a scheduled meeting (video or in-person) with a specific dog. Admin confirms via Telegram; Calendly or manual scheduling.
 
-**Depends on:** Phase 2 (leads exist), optionally Phase 3 (chatbot can surface the CTA)
+**Depends on:** MVP Phase 0.2 (leads exist), optionally MVP Phase 0.3 (chatbot can surface the CTA)
 
 ### B6 — Instagram Chatbot (Top of Funnel)
 
 Instagram DM chatbot using the same AI agent backend as the web chatbot. Requires Meta Messaging API approval (separate from Graph API).
 
-**Depends on:** Phase 3 (AI agent backend deployed)  
+**Depends on:** MVP Phase 0.3 (AI agent backend deployed)  
 **Note:** ManyChat is a SaaS shortcut that handles Meta integration via webhooks.
 
 ### B7 — Dog Sponsorship
 
 Supporters sponsor a specific dog monthly (food + vet coverage). Dog profile shows sponsor badge. Requires payment integration (Stripe or Omise for Thailand).
 
-**Depends on:** Phase 2  
+**Depends on:** MVP Phase 0.2  
 **Note:** Most complex backlog item — requires business account and payment provider setup.
 
 ---
@@ -199,11 +199,11 @@ Not scheduled. Consider only after the backlog above is substantially built.
 
 | Layer | Technology | Hosting | First appears |
 |-------|------------|---------|---------------|
-| Frontend | Next.js 15 (App Router, TypeScript) | Vercel | Phase 1 |
-| DB / Auth / Storage | Supabase JS Client → Supabase | Supabase (managed) | Phase 2 |
-| Backend (AI only) | FastAPI (Python 3.12) | Google Cloud Run | Phase 3 |
-| AI Agent | LangChain + Claude API | Cloud Run | Phase 3 |
-| Notifications | Telegram Bot API | External | Phase 3 |
+| Frontend | Next.js 15 (App Router, TypeScript) | Vercel | MVP Phase 0.1 |
+| DB / Auth / Storage | Supabase JS Client → Supabase | Supabase (managed) | MVP Phase 0.2 |
+| Backend (AI only) | FastAPI (Python 3.12) | Google Cloud Run | MVP Phase 0.3 |
+| AI Agent | LangChain + Claude API | Cloud Run | MVP Phase 0.3 |
+| Notifications | Telegram Bot API | External | MVP Phase 0.3 |
 | Telegram Admin Agent | LangChain + Whisper + Claude | Cloud Run | Backlog B1 |
 
 Key docs: [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md) · [`docs/architecture/data-model.md`](docs/architecture/data-model.md)
