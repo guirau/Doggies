@@ -8,6 +8,7 @@ Behavioral guidelines to reduce common LLM coding mistakes. This file is project
 
 Before starting any non-trivial task in this project, read the following documents:
 
+* `MAP.md` — navigation index. Read first when you need to locate a topic; it points to the smallest doc that answers the question, instead of grepping the tree or opening multiple files.
 * `PROJECT.md` — project-specific configuration this file refers to (test framework, doc paths, available skills, vendor list, etc.). If it does not exist, ask the user before continuing.
 * `ROADMAP.md` — the single source of truth for build order and project state. Do not build anything outside the current phase without explicit approval.
 * `REQUIREMENTS.md` — stable requirement IDs with scope labels (`v1` / `v2` / `out-of-scope`). Use these IDs when writing tests, ADRs, and PR descriptions.
