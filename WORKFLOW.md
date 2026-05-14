@@ -243,19 +243,44 @@ Superpowers' `finishing-a-development-branch` skill integrates with this model �
 
 **Output:** `.github/workflows/ci.yml`, Vercel project configured
 
-### 2f. Memory Path Fix (ECC)
+### 2f. Memory Path Configuration (ECC) — usually skip
 
-Pin ECC memory to a stable location.
+**TL;DR:** don't set `MEMORY_FILE_PATH` unless you're actively using the ECC knowledge-graph memory tools. Three different memory systems get conflated under "ECC memory"; only one of them is governed by this env var.
 
-**Option A — Per-project (recommended):**
+**What's actually in play**
+
+| Memory system | Storage | Governed by `MEMORY_FILE_PATH`? |
+|---|---|---|
+| Claude Code built-in auto-memory | `~/.claude/projects/<encoded-project-path>/memory/` (`MEMORY.md` + per-topic Markdown files) | No. Per-project by construction. Already running. |
+| ECC session summaries (`ecc:save-session`) | Hooked into SessionStart; piggybacks on the auto-memory directory | No. Works with the env var unset. |
+| ECC knowledge-graph memory (`mcp__plugin_ecc_memory__*` — `create_entities`, `add_observations`, `create_relations`, etc.) | `memory.jsonl` at the path given by `MEMORY_FILE_PATH` | **Yes — and only this one.** |
+
+**Why most projects should skip this**
+
+1. The only thing `MEMORY_FILE_PATH` scopes is the knowledge-graph tools. If you're not calling `mcp__plugin_ecc_memory__*` directly, setting the path is dead config.
+2. The "cross-project memory bleed" risk that the per-project option exists to solve is already handled — Claude Code's built-in auto-memory is per-project because the project path is encoded into the storage directory name.
+3. Stale-path risk: every time the project moves on disk, the env var has to be updated. If nothing reads or writes to it, the breakage is silent.
+
+**When to actually set this**
+
+Both conditions need to be true:
+
+- You've started calling `mcp__plugin_ecc_memory__*` tools to build a project-specific knowledge graph (entities like Dogs, Adopters, Integrations, with explicit relations between them).
+- You also have or expect other projects building their own graphs, and you want them isolated rather than merged.
+
+The signal that you've crossed the threshold is concrete: a `memory.jsonl` file appears in your tree, or ECC memory tool calls fail / persist somewhere you didn't expect.
+
+**If you do need it — Option A (per-project, the right default once you cross the threshold)**
 
 ```json
-{ "MEMORY_FILE_PATH": "/Users/guirau/GitHub/guirau/Experiments/Doggies/.claude/memory.jsonl" }
+{ "MEMORY_FILE_PATH": "/Users/guirau/GitHub/guirau/Doggies/.claude/memory.jsonl" }
 ```
 
-in `settings.local.json`.
+in `.claude/settings.local.json` (not the global `~/.claude/settings.json` — that would defeat per-project scoping).
 
-**Option B — Global shared memory:**
+**Option B — Global shared graph**
+
+Only useful if you specifically want a single ECC knowledge graph shared across every project (rare for a solo dev with separate product domains).
 
 ```json
 { "MEMORY_FILE_PATH": "/Users/guirau/.claude/memory.jsonl" }
@@ -263,7 +288,7 @@ in `settings.local.json`.
 
 in `~/.claude/settings.json`.
 
-`ecc:save-session` (at session end) is what actually writes. Superpowers itself has no memory system in the core plugin — if you want cross-session recall of past conversations, there's a separate `episodic-memory` plugin from the same author. Don't install it yet; start with ECC-only and see if you miss anything.
+**Superpowers note**: the core `obra/superpowers` plugin ships no memory system. If you want recall of past conversations beyond what Claude Code's auto-memory and ECC session summaries already give you, there's a separate `episodic-memory` plugin from the same author. Don't install it yet; start with the defaults and see if you actually miss anything.
 
 ---
 
