@@ -200,6 +200,7 @@ Optional sidecars (create only if you need them): [work on then in CLAUDE.md]
 
 * **`REQUIREMENTS.md`** — REQ-IDs (`AUTH-01`, `PROF-02`), v1 scope + deferred v2 + out-of-scope. Superpowers doesn't auto-read this; CLAUDE.md must tell it to. Add this line to CLAUDE.md: *"Before brainstorming any feature, identify which REQ-IDs from REQUIREMENTS.md this feature satisfies. The spec doc must list them under a `Satisfies:` header."*
 * **`ROADMAP.md`** — flat list of features with status (`not-started` / `spec'd` / `planned` / `executing` / `shipped`) and assigned REQ-IDs. Replaces GSD's ROADMAP.md. Update manually after each feature ships.
+* **`MAP.md`** — To help Claude navigate the documentation without having to read everything everytime. Also, a human readable diagram to understand documentation files are connected.
 
 **What you're NOT creating:**
 
