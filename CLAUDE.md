@@ -10,6 +10,8 @@ Before starting any non-trivial task in this project, read `PROJECT.md` in the p
 
 If `PROJECT.md` does not exist, ask the user before continuing.
 
+Also read `docs/learnings.md` before starting work on any feature. It records root causes and fixes from earlier development — things that went wrong, how they were resolved, and what the correct approach turned out to be. Applying these learnings avoids repeating past mistakes and speeds up implementation. When something breaks during development and is fixed, add an entry to `docs/learnings.md` before marking the task done.
+
 ## 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**

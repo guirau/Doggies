@@ -177,6 +177,7 @@ Quit and restart Claude Code. Verify with `/help` — you should see Superpowers
 * **`code-refactor`** — Handles whole-feature structural cleanup after execution; Superpowers' inter-task review doesn't do this.
 * **`planner`** — A Socratic PRD generation agent (Phase 1, once per project). It's *not* the same as Superpowers' `writing-plans` — that skill produces feature-level TDD execution plans, while `planner` produces a project-level PRD with evaluation criteria and sprint contracts. Different scope entirely.
 * **`e2e-testing`** — TBD. E2E testing with Playwright
+* **`tool-selection`** — Tool selection agent with research capabilities, to chose the best option between open-source solutions, free or paid SaaS, or custom solutions. Has research capabilities to find the best options in the market, as well as allowing the user to provide a GitHub repo.
 
 **Output:** `.claude/agents/*` `.claude/rules/*`
 
@@ -193,16 +194,16 @@ Create `CLAUDE.md` at the repo root with these sections:
   * Propose 2–3 options per feature; flag SaaS replacements (payments → Stripe, chat → Discord, etc.)
   * Custom is last resort and must be justified
 * **TDD directive** — *"If about to write code without a failing test first, stop and write the test."* (Superpowers' `test-driven-development` skill enforces this anyway, but the redundancy is cheap.)
-* **Reading order at session start** — tell Claude to read `docs/prd/prd.md`, `REQUIREMENTS.md`, and `FEATURES.md` before starting any brainstorm. Also include reference to any markdown memory files like `docs/progress.md` or `docs/learnings.md`
+* **Reading order at session start** — tell Claude to read `docs/prd/prd.md`, `REQUIREMENTS.md`, and `ROADMAP.md` before starting any brainstorm. Also include reference to any markdown memory files like ~~`docs/progress.md` or~~ `docs/learnings.md`
 
 Optional sidecars (create only if you need them): [work on then in CLAUDE.md]
 
 * **`REQUIREMENTS.md`** — REQ-IDs (`AUTH-01`, `PROF-02`), v1 scope + deferred v2 + out-of-scope. Superpowers doesn't auto-read this; CLAUDE.md must tell it to. Add this line to CLAUDE.md: *"Before brainstorming any feature, identify which REQ-IDs from REQUIREMENTS.md this feature satisfies. The spec doc must list them under a `Satisfies:` header."*
-* **`FEATURES.md`** — flat list of features with status (`not-started` / `spec'd` / `planned` / `executing` / `shipped`) and assigned REQ-IDs. Replaces GSD's ROADMAP.md. Update manually after each feature ships.
+* **`ROADMAP.md`** — flat list of features with status (`not-started` / `spec'd` / `planned` / `executing` / `shipped`) and assigned REQ-IDs. Replaces GSD's ROADMAP.md. Update manually after each feature ships.
 
 **What you're NOT creating:**
 
-* `STATE.md` — Superpowers has no state-injection hook. The plan file's checkboxes are the state-across-sessions mechanism (unchecked boxes tell the next session where to resume). Good enough for a solo project.
+* ~~`STATE.md` — Superpowers has no state-injection hook. The plan file's checkboxes are the state-across-sessions mechanism (unchecked boxes tell the next session where to resume). Good enough for a solo project.~~
 * `.planning/research/*` — no auto-read equivalent. If you need research for a feature, either reference it manually during brainstorming (`"read docs/research/pgvector.md before we design this"`) or write a tiny custom skill that auto-loads a research directory. For Doggies the stack is known, so this is unlikely to matter.
 
 ### 2d. Git Branch Structure
