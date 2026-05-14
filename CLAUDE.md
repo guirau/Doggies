@@ -6,11 +6,12 @@ Behavioral guidelines to reduce common LLM coding mistakes. This file is project
 
 ## 0. Project Context
 
-Before starting any non-trivial task in this project, read `PROJECT.md` in the project root. It contains the project-specific configuration this file refers to (test framework, doc paths, available skills, vendor list, etc.).
+Before starting any non-trivial task in this project, read the following documents:
 
-If `PROJECT.md` does not exist, ask the user before continuing.
-
-Also read `docs/learnings.md` before starting work on any feature. It records root causes and fixes from earlier development — things that went wrong, how they were resolved, and what the correct approach turned out to be. Applying these learnings avoids repeating past mistakes and speeds up implementation. When something breaks during development and is fixed, add an entry to `docs/learnings.md` before marking the task done.
+* `PROJECT.md` — project-specific configuration this file refers to (test framework, doc paths, available skills, vendor list, etc.). If it does not exist, ask the user before continuing.
+* `ROADMAP.md` — the single source of truth for build order and project state. Do not build anything outside the current phase without explicit approval.
+* `REQUIREMENTS.md` — stable requirement IDs with scope labels (`v1` / `v2` / `out-of-scope`). Use these IDs when writing tests, ADRs, and PR descriptions.
+* `docs/learnings.md` — root causes and fixes from earlier development. **Read before starting any feature.** **Write before marking any task done** if the work involved a fix, a surprising discovery, or a non-obvious correct approach. Use the template in `docs/learnings.md` (title, date, phase, area, what happened, root cause, fix). Record the root cause and the specific fix — not just "it's fixed". File paths, package versions, error messages, and commands belong in the entry. Do not record general programming advice; only lessons specific to this project and stack.
 
 ## 1. Think Before Coding
 
@@ -56,7 +57,7 @@ Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, sim
 * Write the failing test before the implementation.
 * For bugs: write a test that reproduces the bug, then fix it.
 * For features: write tests for the contract, then build to pass them.
-* Every acceptance criterion in the project's planning docs (PRD, spec, issue) must be independently testable.
+* Every acceptance criterion in the project's planning docs must be independently testable. For this project, the primary reference is `REQUIREMENTS.md` — each requirement ID (e.g. `UI-01`, `AUTH-03`) must have at least one test that confirms it passes before the requirement is considered done.
 
 **Forcing line: If you're about to write code without a failing test first, stop and write the test.**
 
@@ -66,7 +67,7 @@ Test layers to consider (apply those that fit the project shape):
 * Integration tests for boundaries between the app and external services
 * End-to-end tests for critical flows from the user's perspective
 
-No percentage coverage target. The bar is: each acceptance criterion has at least one test. Specific test frameworks for this project are listed in `PROJECT.md`.
+No percentage coverage target. The bar is: each requirement ID in `REQUIREMENTS.md` has at least one test. Specific test frameworks for this project are listed in `PROJECT.md`.
 
 ## 5. Tool & Dependency Selection
 
@@ -92,6 +93,11 @@ For every external service the app depends on:
 **The swap test (always-on):** To replace vendor A with vendor B, you should change one adapter file and one line of wiring - nothing else. If you find yourself importing a vendor SDK outside an adapter module, stop and fix the boundary before continuing.
 
 **For all planning-phase work** that involves new modules, new external integrations, or any non-trivial structural decision: read `ARCHITECTURE.md` in the project root and follow its guidance. If the user @-mentions `@ARCHITECTURE.md`, treat it as the authoritative reference for the task.
+
+For decisions specific to this project's domain, also consult `docs/architecture/`:
+* `system-overview.md` — component responsibilities and key data flows
+* `data-model.md` — full entity definitions, field types, and status state machines (dog status transitions must follow this; invalid transitions must be rejected at the application layer)
+* `ADR-001` through `ADR-006` — recorded technology and design decisions; read the relevant ADR before revisiting a decided choice
 
 If `ARCHITECTURE.md` does not exist in this project, the swap test still applies, but ask the user whether broader architectural rules should be defined before proceeding with structural work.
 
